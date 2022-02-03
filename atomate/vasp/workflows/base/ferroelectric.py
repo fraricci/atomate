@@ -71,7 +71,10 @@ def get_wf_ferroelectric(
     if tags is None:
         tags = []
 
-    if relax:
+    if isinstance(relax,bool):
+        relax = (relax,relax)
+        
+    if relax[0]:
         polar_relax = OptimizeFW(
             structure=polar_structure,
             name="_polar_relaxation",
@@ -79,6 +82,12 @@ def get_wf_ferroelectric(
             db_file=db_file,
             vasp_input_set=vasp_relax_input_set_polar,
         )
+        wf.append(polar_relax)
+        parents_polar = polar_relax
+    else:
+        parents_polar = None
+        
+    if relax[1]:
         nonpolar_relax = OptimizeFW(
             structure=nonpolar_structure,
             name="_nonpolar_relaxation",
@@ -86,12 +95,9 @@ def get_wf_ferroelectric(
             db_file=db_file,
             vasp_input_set=vasp_relax_input_set_nonpolar,
         )
-        wf.append(polar_relax)
         wf.append(nonpolar_relax)
-        parents_polar = polar_relax
         parents_nonpolar = nonpolar_relax
     else:
-        parents_polar = None
         parents_nonpolar = None
 
     # Run polarization calculation on polar structure.
