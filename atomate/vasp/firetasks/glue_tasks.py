@@ -242,8 +242,9 @@ class CheckBandgap(FiretaskBase):
 
         if (min_gap and gap < min_gap) or (max_gap and gap > max_gap):
             logger.info("CheckBandgap: failed test!")
-            return FWAction(stored_data=stored_data, exit=True, defuse_workflow=True)
-
+            # return FWAction(stored_data=stored_data, exit=True, defuse_workflow=True)
+            return FWAction(stored_data=stored_data, exit=True)
+        
         return FWAction(stored_data=stored_data)
 
 
