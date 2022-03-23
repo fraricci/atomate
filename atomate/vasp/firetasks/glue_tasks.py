@@ -240,11 +240,22 @@ class CheckBandgap(FiretaskBase):
         stored_data = {"band_gap": gap}
         logger.info(f"The gap is: {gap}. Min gap: {min_gap}. Max gap: {max_gap}")
 
-        if (min_gap and gap < min_gap) or (max_gap and gap > max_gap):
+        if (min_gap and gap < min_gap):
+            logger.info("CheckBandgap: failed test! Try shifting fermi level slightly upward")
+            bs = vr.get_band_structure()
+            bs.efermi += min_gap
+            gap = bs.get_band_gap()["energy"]
+            if (min_gap and gap < min_gap):
+                logger.info("CheckBandgap: failed test!")
+                # return FWAction(stored_data=stored_data, exit=True, defuse_workflow=True)
+                return FWAction(stored_data=stored_data, exit=True)
+            stored_data = {"band_gap": gap}
+            
+        if (max_gap and gap > max_gap):
             logger.info("CheckBandgap: failed test!")
             # return FWAction(stored_data=stored_data, exit=True, defuse_workflow=True)
             return FWAction(stored_data=stored_data, exit=True)
-        
+
         return FWAction(stored_data=stored_data)
 
 
