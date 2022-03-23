@@ -166,6 +166,7 @@ class RunVaspCustodian(FiretaskBase):
         # initialize variables
         job_type = self.get("job_type", "normal")
         scratch_dir = env_chk(self.get("scratch_dir"), fw_spec)
+        logger.info(f"Running command: {scratch_dir}")
         gzip_output = self.get("gzip_output", True)
         max_errors = self.get("max_errors", CUSTODIAN_MAX_ERRORS)
         auto_npar = env_chk(self.get("auto_npar"), fw_spec, strict=False, default=False)
