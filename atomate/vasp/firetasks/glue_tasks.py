@@ -236,7 +236,7 @@ class CheckBandgap(FiretaskBase):
 
         logger.info(f"Checking the gap of file: {vr_path}")
         vr = Vasprun(vr_path, parse_potcar_file=False)
-        gap = vr.get_band_structure().get_band_gap()["energy"]
+        gap = vr.get_band_structure(efermi='smart').get_band_gap()["energy"]
         stored_data = {"band_gap": gap}
         logger.info(f"The gap is: {gap}. Min gap: {min_gap}. Max gap: {max_gap}")
 
