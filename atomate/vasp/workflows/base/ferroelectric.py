@@ -23,6 +23,8 @@ def get_wf_ferroelectric(
     db_file=None,
     vasp_input_set_polar="MPStaticSet",
     vasp_input_set_nonpolar="MPStaticSet",
+    vasp_input_set_params_polar=None,
+    vasp_input_set_params_nonpolar=None,
     relax=False,
     vasp_relax_input_set_polar=None,
     vasp_relax_input_set_nonpolar=None,
@@ -110,6 +112,7 @@ def get_wf_ferroelectric(
         vasp_cmd=vasp_cmd,
         db_file=db_file,
         vasp_input_set=vasp_input_set_polar,
+        vasp_input_set_params=vasp_input_set_params_polar,
     )
 
     # Run polarization calculation on nonpolar structure.
@@ -122,6 +125,7 @@ def get_wf_ferroelectric(
         vasp_cmd=vasp_cmd,
         db_file=db_file,
         vasp_input_set=vasp_input_set_nonpolar,
+        vasp_input_set_params=vasp_input_set_params_nonpolar,
     )
 
     # Interpolation polarization
@@ -142,6 +146,7 @@ def get_wf_ferroelectric(
                 vasp_cmd=vasp_cmd,
                 db_file=db_file,
                 vasp_input_set=vasp_input_set_polar,
+                vasp_input_set_params=vasp_input_set_params_polar,
                 interpolate=True,
                 start="_polar_static",
                 end="_nonpolar_static",
