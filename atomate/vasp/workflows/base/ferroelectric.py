@@ -33,6 +33,9 @@ def get_wf_ferroelectric(
     add_analysis_task=False,
     wfid=None,
     tags=None,
+    exit_fw=True,
+    defuse_wf=True,
+    
 ):
     """
     Returns a workflow to calculate the spontaneous polarization of polar_structure using
@@ -55,6 +58,8 @@ def get_wf_ferroelectric(
         vasp_input_set_nonpolar (DictVaspInputSet): VASP nonpolar input set. Defaults to MPStaticSet.
         vasp_relax_input_set_polar (DictVaspInputSet): VASP polar input set. Defaults to MPRelaxSet.
         vasp_relax_input_set_nonpolar (DictVaspInputSet): VASP nonpolar input set. Defaults to MPRelaxSet.
+        relax (bool or list of bools): if single bool, relax or not both polar and nonpolar; if list,
+                each bool controls individual relaxation for polar and nonpolar, respectively.
         vasp_cmd (str): command to run
         db_file (str): path to file containing the database credentials.
         nimages: Number of interpolations calculated from polar to nonpolar structures, including the nonpolar.
@@ -62,6 +67,8 @@ def get_wf_ferroelectric(
         add_analysis_task: Analyze polarization and energy trends as part of workflow. Default False.
         wfid (string): Unique workflow id starting with "wfid_". If None this is automatically generated (recommended).
         tags (list of strings): Additional tags to add such as identifiers for structures.
+        exit_fw (bool), exit the lcalcpol fws in case the band gap is below a certain threshold. Default True.
+        defuse_wf (bool), defuse entire wf in case the band gap of any of the structures is below a certain threshold. Default True.
 
     Returns:
 
@@ -113,6 +120,8 @@ def get_wf_ferroelectric(
         db_file=db_file,
         vasp_input_set=vasp_input_set_polar,
         vasp_input_set_params=vasp_input_set_params_polar,
+        exit_fw=exit_fw,
+        defuse_wf=defuse_wf,
     )
 
     # Run polarization calculation on nonpolar structure.
@@ -126,6 +135,8 @@ def get_wf_ferroelectric(
         db_file=db_file,
         vasp_input_set=vasp_input_set_nonpolar,
         vasp_input_set_params=vasp_input_set_params_nonpolar,
+        exit_fw=exit_fw,
+        defuse_wf=defuse_wf,
     )
 
     # Interpolation polarization
@@ -152,6 +163,8 @@ def get_wf_ferroelectric(
                 end="_nonpolar_static",
                 nimages=nimages,
                 this_image=i,
+                exit_fw=exit_fw,
+                defuse_wf=defuse_wf,
                 parents=[polar, nonpolar],
             )
         )

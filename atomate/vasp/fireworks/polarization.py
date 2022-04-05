@@ -29,6 +29,8 @@ class LcalcpolFW(Firework):
         end=None,
         this_image=0,
         nimages=5,
+        exit_fw=True,
+        defuse_wf=True,
         **kwargs,
     ):
         """
@@ -43,7 +45,8 @@ class LcalcpolFW(Firework):
         2. Because VASP cannot compute the dipole moment of metallic structures,
           CheckBandgap checks that the structure has a band gap greater than
           gap_threshold. If the structure has a band  gap less than
-          gap_threshold, the Firework defuses. Otherwise,
+          gap_threshold, the Firework defuses (this behavior can be changed via
+          exit_fw and defuse_fw args). Otherwise,
         3. a polarization calculation (LCALCPOL=TRUE) is performed to calculate
           the dipole moment.
 
@@ -131,7 +134,9 @@ class LcalcpolFW(Firework):
         t.extend(static.tasks)
 
         # Defuse workflow if bandgap is less than gap_threshold.
-        t.append(CheckBandgap(min_gap=gap_threshold))
+        t.append(CheckBandgap(min_gap=gap_threshold,
+                              exit_fw=exit_fw,
+                              defuse_wf=defuse_wf))
 
         # Create new directory and move to that directory to perform
         # polarization calculation

@@ -215,16 +215,21 @@ class CheckBandgap(FiretaskBase):
         min_gap: (float) minimum gap energy in eV to proceed
         max_gap: (float) maximum gap energy in eV to proceed
         vasprun_path: (str) path to vasprun.xml file
+        exit_fw: (bool) exit properly from the fw
+        defuse_wf: (bool) defuse the entire wf
+
     """
 
     required_params = []
-    optional_params = ["min_gap", "max_gap", "vasprun_path"]
+    optional_params = ["min_gap", "max_gap", "vasprun_path","exit_fw","defuse_wf"]
 
     def run_task(self, fw_spec):
         vr_path = zpath(self.get("vasprun_path", "vasprun.xml"))
         min_gap = self.get("min_gap", None)
         max_gap = self.get("max_gap", None)
-
+        exit_fw = self.get("exit_fw",True)
+        defuse_wf = self.get("defuse_wf",True)
+        
         if not os.path.exists(vr_path):
             relax_paths = sorted(glob.glob(vr_path + ".relax*"))
             if relax_paths:
@@ -242,8 +247,7 @@ class CheckBandgap(FiretaskBase):
 
         if (min_gap and gap < min_gap) or (max_gap and gap > max_gap):
             logger.info("CheckBandgap: failed test!")
-            # return FWAction(stored_data=stored_data, exit=True, defuse_workflow=True)
-            return FWAction(stored_data=stored_data, exit=True)
+            return FWAction(stored_data=stored_data, exit=exit_fw, defuse_workflow=defuse_wf)
         
         return FWAction(stored_data=stored_data)
 
