@@ -221,7 +221,7 @@ class CheckBandgap(FiretaskBase):
     """
 
     required_params = []
-    optional_params = ["min_gap", "max_gap", "vasprun_path","exit_fw","defuse_wf"]
+    optional_params = ["min_gap", "max_gap", "vasprun_path", "exit_fw", "defuse_wf"]
 
     def run_task(self, fw_spec):
         vr_path = zpath(self.get("vasprun_path", "vasprun.xml"))
