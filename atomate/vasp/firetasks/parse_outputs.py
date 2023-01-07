@@ -1384,7 +1384,8 @@ class MagneticOrderingsToDb(FiretaskBase):
                 )
             else:
                 energy_diff_relax_static = None
-
+                optimize_task = d
+                
             input_structure = Structure.from_dict(optimize_task["input"]["structure"])
             input_magmoms = optimize_task["input"]["incar"]["MAGMOM"]
             input_structure.add_site_property("magmom", input_magmoms)
