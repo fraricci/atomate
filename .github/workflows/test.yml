@@ -1,4 +1,4 @@
-name: Testing
+name: Tests
 
 on:
   push:
@@ -18,11 +18,14 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
+          cache: pip
+          cache-dependency-path: |
+            setup.py
           python-version: 3.8
 
       - name: Install OpenBabel
@@ -31,18 +34,13 @@ jobs:
           sudo apt-get install libopenbabel-dev
           # https://github.com/openbabel/openbabel/issues/2408#issuecomment-1014466193
           sudo ln -s /usr/include/openbabel3 /usr/local/include/openbabel3
-
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements-ci.txt', 'setup.py') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+      
+      - name: Install phono3py
+        run: |
+          conda install -c conda-forge phono3py
 
       - name: Install dependencies
         run: |
-          pip install -r requirements-ci.txt
           pip install .[complete]
 
       - name: pytest

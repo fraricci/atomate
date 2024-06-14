@@ -1,5 +1,4 @@
 import os
-import unittest
 
 import numpy as np
 from fireworks import Firework, FWorker, Workflow
@@ -26,12 +25,10 @@ module_dir = os.path.dirname(os.path.abspath(__file__))
 db_dir = os.path.join(module_dir, "..", "..", "..", "common", "test_files")
 ref_dir = os.path.join(module_dir, "..", "..", "test_files")
 
-DEBUG_MODE = (
-    False  # If true, retains the database and output dirs at the end of the test
-)
-VASP_CMD = (
-    None  # If None, runs a "fake" VASP. Otherwise, runs VASP with this command...
-)
+# If DEBUG_MODE = true, retains the database and output dirs at the end of the test
+DEBUG_MODE = False
+# If None, runs a "fake" VASP. Otherwise, runs VASP with this command...
+VASP_CMD = None
 
 
 class TestElasticWorkflow(AtomateTest):
@@ -225,7 +222,3 @@ class TestElasticWorkflow(AtomateTest):
 
         wf = self.lp.get_wf_by_fw_id(1)
         self.assertTrue(all([s == "COMPLETED" for s in wf.fw_states.values()]))
-
-
-if __name__ == "__main__":
-    unittest.main()

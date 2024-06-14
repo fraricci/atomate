@@ -1,8 +1,8 @@
 import os
 import unittest
+from shutil import which
 
 import pandas as pd
-from monty.os.path import which
 from pymatgen.core import Structure
 
 from atomate.utils.testing import AtomateTest
@@ -64,7 +64,3 @@ class TestExchangeTasks(AtomateTest):
 
         vtdb = VampireToDb(db_file=self.db_file, wf_uuid=self.uuid)
         vtdb.run_task({})
-
-
-if __name__ == "__main__":
-    unittest.main()

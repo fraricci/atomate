@@ -1,10 +1,10 @@
 import os
 import unittest
+from shutil import which
 
 import pandas as pd
 from fireworks import FWorker
 from fireworks.core.rocket_launcher import rapidfire
-from monty.os.path import which
 from pymatgen.core import Structure
 
 from atomate.utils.testing import AtomateTest
@@ -95,7 +95,3 @@ class TestExchangeWF(AtomateTest):
         ).get_wf(c=c)
 
         return wf
-
-
-if __name__ == "__main__":
-    unittest.main()

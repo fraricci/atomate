@@ -2,8 +2,8 @@ import json
 import os
 import shutil
 import unittest
+from shutil import which
 
-from monty.os.path import which
 from pymatgen.io.qchem.outputs import QCOutput
 
 from atomate.qchem.firetasks.critic2 import ProcessCritic2, RunCritic2
@@ -119,7 +119,3 @@ class TestProcessCritic2(AtomateTest):
         with open("processed_critic2.json") as f:
             just_built = json.load(f)
         self.assertEqual(reference, just_built)
-
-
-if __name__ == "__main__":
-    unittest.main()

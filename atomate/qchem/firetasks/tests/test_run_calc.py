@@ -1,6 +1,5 @@
 import os
 import shutil
-import unittest
 
 try:
     from unittest.mock import patch
@@ -89,7 +88,6 @@ class TestRunCalcQChem(AtomateTest):
         with patch("atomate.qchem.firetasks.run_calc.Custodian") as custodian_patch:
             firetask = RunQChemCustodian(
                 qchem_cmd=">>qchem_cmd<<",
-                calc_loc=">>calc_loc<<",
                 input_file=os.path.join(
                     module_dir, "..", "..", "test_files", "co_qc.in"
                 ),
@@ -103,6 +101,7 @@ class TestRunCalcQChem(AtomateTest):
                         "calc_loc": "/this/is/a/test",
                         "max_cores": 32,
                         "multimode": "openmp",
+                        "nboexe": "/path/to/nbo7.i4.exe",
                     }
                 }
             )
@@ -121,6 +120,7 @@ class TestRunCalcQChem(AtomateTest):
                 QCJob(
                     qchem_command="qchem -slurm",
                     calc_loc="/this/is/a/test",
+                    nboexe="/path/to/nbo7.i4.exe",
                     max_cores=32,
                     multimode="openmp",
                     input_file=os.path.join(
@@ -179,7 +179,6 @@ class TestRunCalcQChem(AtomateTest):
         with patch("atomate.qchem.firetasks.run_calc.Custodian") as custodian_patch:
             firetask = RunQChemCustodian(
                 qchem_cmd=">>qchem_cmd<<",
-                calc_loc=">>calc_loc<<",
                 multimode=">>multimode<<",
                 input_file=os.path.join(
                     module_dir, "..", "..", "test_files", "co_qc.in"
@@ -283,6 +282,7 @@ class TestRunCalcQChem(AtomateTest):
                         "calc_loc": None,
                         "freq_before_opt": False,
                         "transition_state": False,
+                        "nboexe": None,
                     },
                 )
 
@@ -293,7 +293,6 @@ class TestRunCalcQChem(AtomateTest):
             ) as FF_patch:
                 firetask = RunQChemCustodian(
                     qchem_cmd=">>qchem_cmd<<",
-                    calc_loc=">>calc_loc<<",
                     max_cores=">>max_cores<<",
                     multimode=">>multimode<<",
                     input_file=os.path.join(
@@ -354,6 +353,7 @@ class TestRunCalcQChem(AtomateTest):
                         "max_cores": 32,
                         "freq_before_opt": False,
                         "transition_state": False,
+                        "nboexe": None,
                     },
                 )
 
@@ -365,6 +365,7 @@ class TestRunCalcQChem(AtomateTest):
                 firetask = RunQChemCustodian(
                     qchem_cmd="qchem -slurm",
                     calc_loc="/this/is/a/test",
+                    nboexe="/path/to/nbo7.i4.exe",
                     input_file=os.path.join(
                         module_dir,
                         "..",
@@ -425,6 +426,7 @@ class TestRunCalcQChem(AtomateTest):
                         "max_molecule_perturb_scale": 0.5,
                         "linked": False,
                         "calc_loc": "/this/is/a/test",
+                        "nboexe": "/path/to/nbo7.i4.exe",
                         "save_final_scratch": True,
                         "max_cores": 4,
                         "freq_before_opt": True,
@@ -439,7 +441,6 @@ class TestRunCalcQChem(AtomateTest):
             ) as FF_patch:
                 firetask = RunQChemCustodian(
                     qchem_cmd=">>qchem_cmd<<",
-                    calc_loc=">>calc_loc<<",
                     input_file=os.path.join(
                         module_dir,
                         "..",
@@ -509,6 +510,7 @@ class TestRunCalcQChem(AtomateTest):
                         "max_molecule_perturb_scale": 0.5,
                         "linked": False,
                         "calc_loc": "/this/is/a/test",
+                        "nboexe": None,
                         "save_final_scratch": True,
                         "max_cores": 4,
                         "freq_before_opt": True,
@@ -540,16 +542,18 @@ class TestFakeRunQChem(AtomateTest):
         ).data
         this_out = QCOutput("mol.qout").data
         for key in ref_out:
-            try:
-                self.assertEqual(ref_out[key], this_out[key])
-            except ValueError:
-                np.testing.assert_array_equal(ref_out[key], this_out[key])
+            if key == "dipoles":
+                self.assertEqual(ref_out[key]["total"], this_out[key]["total"])
+                np.testing.assert_array_equal(
+                    ref_out[key]["dipole"], this_out[key]["dipole"]
+                )
+            else:
+                try:
+                    self.assertEqual(ref_out[key], this_out[key])
+                except ValueError:
+                    np.testing.assert_array_equal(ref_out[key], this_out[key])
         for filename in os.listdir(
             os.path.join(module_dir, "..", "..", "test_files", "real_run")
         ):
             self.assertEqual(os.path.isfile(filename), True)
         os.chdir(module_dir)
-
-
-if __name__ == "__main__":
-    unittest.main()

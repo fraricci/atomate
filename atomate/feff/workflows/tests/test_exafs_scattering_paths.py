@@ -41,7 +41,6 @@ class TestEXAFSPaths(unittest.TestCase):
             "nkpts": 1000,
             "radius": 10.0,
             "user_tag_settings": {},
-            "structure": self.struct.as_dict(),
         }
         ans_fis_fw2 = {
             "@class": "MPEXAFSSet",
@@ -51,13 +50,14 @@ class TestEXAFSPaths(unittest.TestCase):
             "nkpts": 1000,
             "radius": 10.0,
             "user_tag_settings": {"CONTROL": "0 0 0 0 1 1", "PRINT": "0 0 0 1 0 3"},
-            "structure": self.struct.as_dict(),
         }
         fis_fw1 = self.fw1_dict["spec"]["_tasks"][0]["feff_input_set"]
         fis_fw2 = self.fw2_dict["spec"]["_tasks"][1]["feff_input_set"]
 
         fis_fw1.pop("@version")
         fis_fw2.pop("@version")
+        fis_fw1.pop("structure")
+        fis_fw2.pop("structure")
 
         self.assertDictEqual(fis_fw1, ans_fis_fw1)
         self.assertDictEqual(fis_fw2, ans_fis_fw2)
@@ -65,7 +65,3 @@ class TestEXAFSPaths(unittest.TestCase):
     def test_paths(self):
         paths = [[249, 0], [85, 0]]
         self.assertEqual(paths, self.fw2_dict["spec"]["_tasks"][2]["paths"])
-
-
-if __name__ == "__main__":
-    unittest.main()

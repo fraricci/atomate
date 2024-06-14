@@ -1,5 +1,4 @@
 import os
-import unittest
 
 from fireworks.core.fworker import FWorker
 from fireworks.core.rocket_launcher import rapidfire
@@ -14,9 +13,8 @@ __email__ = "kmathew@lbl.gov"
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 db_dir = os.path.join(module_dir, "..", "..", "..", "common", "test_files")
-DEBUG_MODE = (
-    False  # If true, retains the database and output dirs at the end of the test
-)
+# If DEBUG_MODE = true, retains the database and output dirs at the end of the test
+DEBUG_MODE = False
 
 
 class TestEELSWorkflow(AtomateTest):
@@ -123,7 +121,3 @@ class TestEELSWorkflow(AtomateTest):
         self.assertEqual(d["absorbing_atom"], self.absorbing_atom)
         tags = Tags.from_file(os.path.join(run_dir, "feff.inp"))
         self.assertEqual(d["input_parameters"], tags.as_dict())
-
-
-if __name__ == "__main__":
-    unittest.main()

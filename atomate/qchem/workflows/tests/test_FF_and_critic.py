@@ -1,5 +1,4 @@
 import os
-import unittest
 
 from fireworks import FWorker
 from fireworks.core.rocket_launcher import rapidfire
@@ -51,12 +50,8 @@ class TestFFOptandCritic(AtomateTest):
         # use powerup to replace run with fake run
         alph_formula = initial_mol.composition.alphabetical_formula
         ref_dirs = {
-            f"{alph_formula}:FFopt_testing": os.path.join(
-                test_files, "FFopt"
-            ),
-            f"{alph_formula}:CC2_testing": os.path.join(
-                test_files, "critic_example"
-            ),
+            f"{alph_formula}:FFopt_testing": os.path.join(test_files, "FFopt"),
+            f"{alph_formula}:CC2_testing": os.path.join(test_files, "critic_example"),
         }
         fake_wf = use_fake_qchem(real_wf, ref_dirs)
         self.lp.add_wf(fake_wf)
@@ -89,7 +84,3 @@ class TestFFOptandCritic(AtomateTest):
             os.path.join(test_files, "critic_example", "critic2_drone_ref.json")
         )
         self.assertEqual(CC2["critic2"], critic2_drone_ref)
-
-
-if __name__ == "__main__":
-    unittest.main()

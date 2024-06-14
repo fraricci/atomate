@@ -2,7 +2,10 @@
 Defines standardized Fireworks that can be chained easily to perform various
 sequences of VASP calculations.
 """
+from __future__ import annotations
+
 import warnings
+from typing import Any
 
 from fireworks import Firework
 from pymatgen.core import Structure
@@ -24,7 +27,6 @@ from atomate.common.firetasks.glue_tasks import (
 from atomate.vasp.config import (
     DB_FILE,
     HALF_KPOINTS_FIRST_RELAX,
-    RELAX_MAX_FORCE,
     VASP_CMD,
     VDW_KERNEL_DIR,
 )
@@ -62,7 +64,6 @@ class OptimizeFW(Firework):
         db_file=DB_FILE,
         force_gamma=True,
         job_type="double_relaxation_run",
-        max_force_threshold=RELAX_MAX_FORCE,
         auto_npar=">>auto_npar<<",
         half_kpts_first_relax=HALF_KPOINTS_FIRST_RELAX,
         parents=None,
@@ -83,7 +84,6 @@ class OptimizeFW(Firework):
             db_file (str): Path to file specifying db credentials to place output parsing.
             force_gamma (bool): Force gamma centered kpoint generation
             job_type (str): custodian job type (default "double_relaxation_run")
-            max_force_threshold (float): max force on a site allowed at end; otherwise, reject job
             auto_npar (bool or str): whether to set auto_npar. defaults to env_chk: ">>auto_npar<<"
             half_kpts_first_relax (bool): whether to use half the kpoints for the first relaxation
             parents ([Firework]): Parents of this particular Firework.
@@ -108,7 +108,6 @@ class OptimizeFW(Firework):
             RunVaspCustodian(
                 vasp_cmd=vasp_cmd,
                 job_type=job_type,
-                max_force_threshold=max_force_threshold,
                 ediffg=ediffg,
                 auto_npar=auto_npar,
                 half_kpts_first_relax=half_kpts_first_relax,
@@ -240,7 +239,7 @@ class ScanOptimizeFW(Firework):
 
                 # Enable vdW for the SCAN step
                 settings["_set"]["LUSE_VDW"] = True
-                settings["_set"]["BPARAM"] = 15.7
+                settings["_set"]["BPARAM"] = 11.95
 
             t.append(ModifyIncar(incar_dictmod=settings))
 
@@ -255,11 +254,16 @@ class ScanOptimizeFW(Firework):
                 WriteVaspFromIOSet(structure=structure, vasp_input_set=vasp_input_set)
             )
             # Update the INCAR for the PBESol GGA preconditioning step
-            pre_opt_settings = {"_set": {"GGA": "Ps", "METAGGA": None, "EDIFFG": -0.05}}
+            metagga_type = vasp_input_set.incar.get("METAGGA",
+                       vasp_input_set_params.get("METAGGA", "R2scan"))
+            pre_opt_settings = {"_set": {"GGA": "Ps", "EDIFFG": -0.05},
+                                "_unset": {"METAGGA": metagga_type}}
 
             # Disable vdW for the precondition step
             if vasp_input_set_params.get("vdw"):
-                pre_opt_settings.update({"_unset": {"LUSE_VDW": True, "BPARAM": 15.7}})
+                pre_opt_settings.update({"_unset": {"LUSE_VDW": True,
+                                                    "BPARAM": 11.95,
+                                                    "METAGGA": metagga_type}})
 
             t.append(ModifyIncar(incar_dictmod=pre_opt_settings))
 
@@ -333,7 +337,8 @@ class StaticFW(Firework):
             vasptodb_kwargs["additional_fields"] = {}
         vasptodb_kwargs["additional_fields"]["task_label"] = name
 
-        formula = structure.composition.reduced_formula if structure != None else "unknown"
+        formula = structure.composition.reduced_formula if structure is not None else "unknown"
+
         fw_name = f"{formula}-{name}"
 
         if spec_structure_key is not None:
@@ -356,7 +361,11 @@ class StaticFW(Firework):
                     CopyVaspOutputs(calc_loc=prev_calc_loc, contcar_to_poscar=True)
                 )
             t.append(WriteVaspStaticFromPrev(other_params=vasp_input_set_params))
+<<<<<<< HEAD
         elif structure != None:
+=======
+        elif structure is not None:
+>>>>>>> upstream/main
             vasp_input_set = vasp_input_set or MPStaticSet(
                 structure, **vasp_input_set_params
             )
@@ -583,26 +592,26 @@ class NonSCFFW(Firework):
 class DFPTFW(Firework):
     def __init__(
         self,
-        structure=None,
-        prev_calc_dir=None,
-        name="static dielectric",
-        vasp_cmd=VASP_CMD,
-        copy_vasp_outputs=True,
-        lepsilon=True,
-        db_file=DB_FILE,
-        parents=None,
-        user_incar_settings=None,
-        pass_nm_results=False,
+        structure: Structure = None,
+        prev_calc_dir: str = None,
+        name: str = "static dielectric",
+        vasp_cmd: str = VASP_CMD,
+        copy_vasp_outputs: bool = True,
+        lepsilon: bool = True,
+        db_file: str = DB_FILE,
+        parents: Firework | list[Firework] = None,
+        user_incar_settings: dict[str, Any] = None,
+        pass_nm_results: bool = False,
         **kwargs,
-    ):
+    ) -> None:
         """
-         Static DFPT calculation Firework
+        Static DFPT calculation Firework
 
         Args:
             structure (Structure): Input structure. If copy_vasp_outputs, used only to set the
                 name of the FW.
             name (str): Name for the Firework.
-            lepsilon (bool): Turn on LEPSILON to calculate polar properties
+            lepsilon (bool): Turn on LEPSILON to calculate polar properties. Defaults to True.
             vasp_cmd (str): Command to run vasp.
             copy_vasp_outputs (str or bool): Whether to copy outputs from previous
                 run. Defaults to True.
